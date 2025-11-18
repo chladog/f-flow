@@ -3,7 +3,7 @@ import { FConnectionBase, FMarkerBase } from '../f-connection';
 import { FFlowBase } from '../f-flow';
 import { FCanvasBase } from '../f-canvas';
 import { FBackgroundBase } from '../f-backgroud';
-import { FNodeBase } from '../f-node';
+import { FNodeBase, FNodeChildrenBase } from '../f-node';
 import { FConnectorBase } from '../f-connectors';
 import { FDraggableBase } from '../f-draggable';
 import { FChannel } from '../reactivity';
@@ -31,6 +31,8 @@ export class FComponentsStore {
   public fBackground: FBackgroundBase | undefined;
 
   public fNodes: FNodeBase[] = [];
+
+  public fChildren: FNodeChildrenBase[] = [];
 
   public fConnections: FConnectionBase[] = [];
 

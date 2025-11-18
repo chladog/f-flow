@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ApplyParentResizeConstraintsRequest } from './apply-parent-resize-constraints-request';
 import { IRect } from '@foblex/2d';
 import { FExecutionRegister, IExecution } from '@foblex/mediator';
 import { IResizeLimit, IResizeLimits, IResizeOverflow } from '../constraint';
+import { FComponentsStore } from '../../../f-storage';
 
 /**
  * Resize constraints behavior:
@@ -16,6 +17,8 @@ import { IResizeLimit, IResizeLimits, IResizeOverflow } from '../constraint';
 export class ApplyParentResizeConstraints
   implements IExecution<ApplyParentResizeConstraintsRequest, void>
 {
+  private readonly _store = inject(FComponentsStore);
+
   /** Entry point: applies soft and hard resize constraints. */
   public handle({ rect, limits }: ApplyParentResizeConstraintsRequest): void {
     this._applyResizeConstraints(rect, limits);
@@ -162,8 +165,38 @@ export class ApplyParentResizeConstraints
 
   /** Applies the calculated parent rect to the node/group. */
   private _applyParentRect(limit: IResizeLimit, rect: IRect): void {
+    const original = limit.boundingRect;
+    const widthDelta = rect.width - original.width;
+    const heightDelta = rect.height - original.height;
+    
     limit.nodeOrGroup.updatePosition(rect);
     limit.nodeOrGroup.updateSize(rect);
     limit.nodeOrGroup.redraw();
+    
+    // Also expand any fChildren slots within this parent
+    if (widthDelta !== 0 || heightDelta !== 0) {
+      this._expandChildrenSlot(limit.nodeOrGroup, widthDelta, heightDelta);
+    }
+  }
+
+  /** Expands the fChildren slot when parent is resized. */
+  private _expandChildrenSlot(parent: any, widthDelta: number, heightDelta: number): void {
+    const childrenSlot = this._store.fChildren.find(x => x.fNodeId() === parent.fId());
+    
+    if (childrenSlot) {
+      const element = childrenSlot.hostElement;
+      const currentWidth = element.offsetWidth;
+      const currentHeight = element.offsetHeight;
+      
+      // Slot stays in natural flow (position: relative)
+      // Only expand its width/height proportionally with parent
+      if (widthDelta !== 0) {
+        element.style.width = `${currentWidth + widthDelta}px`;
+      }
+      
+      if (heightDelta !== 0) {
+        element.style.height = `${currentHeight + heightDelta}px`;
+      }
+    }
   }
 }

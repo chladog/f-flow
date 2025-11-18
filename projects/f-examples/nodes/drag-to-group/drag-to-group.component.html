@@ -15,8 +15,13 @@
         [fAutoSizeToFitChildren]="autoSizeToFitChildren()"
         [fAutoExpandOnChildHit]="autoExpandOnChildHit()"
         [fGroupPosition]="group.position"
+        [ngClass]="getNodeClasses(group)"
       >
         Drag to Group
+        <div fChildren class="children-area">
+            <!-- Child nodes can also be nested in regular nodes -->
+            <!-- Automatically inherits parent node's ID and settings -->
+          </div>
       </div>
     }
 
@@ -30,9 +35,14 @@
         [fAutoSizeToFitChildren]="autoSizeToFitChildren()"
         [fAutoExpandOnChildHit]="autoExpandOnChildHit()"
         [fNodePosition]="node.position"
+        [ngClass]="getNodeClasses(node)"
       >
         Drag to Group
-      </div>
+      <div fChildren class="children-area">
+            <!-- Child nodes can also be nested in regular nodes -->
+            <!-- Automatically inherits parent node's ID and settings -->
+          </div>
+        </div>
     }
   </f-canvas>
 </f-flow>

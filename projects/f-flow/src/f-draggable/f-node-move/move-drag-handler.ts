@@ -7,6 +7,8 @@ import { Injector } from "@angular/core";
 import { IDragLimits } from "./create-drag-model-from-selection";
 import { DragConstraintPipeline, expandRectFromBaseline, IConstraintResult } from "./constraint";
 import { FMediator } from "@foblex/mediator";
+import { FComponentsStore } from "../../f-storage";
+import { FNodeChildrenBase } from "../../f-node";
 
 export class MoveDragHandler implements IFDragHandler {
 
@@ -57,9 +59,38 @@ export class MoveDragHandler implements IFDragHandler {
   }
 
   private _commitParentRect(parent: FNodeBase, rect: IRect): void {
+    const previousRect = this._injector.get(FMediator).execute<IRect>(new GetNormalizedElementRectRequest(parent.hostElement));
+    
     parent.updateSize({ width: rect.width, height: rect.height });
     parent.updatePosition({ x: rect.x, y: rect.y });
     parent.redraw();
+    
+    // Also expand any fChildren slots within this parent by the same amount
+    this._expandChildrenSlots(parent, previousRect, rect);
+  }
+
+  private _expandChildrenSlots(parent: FNodeBase, oldParentRect: IRect, newParentRect: IRect): void {
+    const store = this._injector.get(FComponentsStore);
+    const childrenSlot = store.fChildren.find(x => x.fNodeId() === parent.fId());
+    
+    if (childrenSlot) {
+      const widthDelta = newParentRect.width - oldParentRect.width;
+      const heightDelta = newParentRect.height - oldParentRect.height;
+      
+      const element = childrenSlot.hostElement;
+      const currentWidth = element.offsetWidth;
+      const currentHeight = element.offsetHeight;
+      
+      // Slot stays in natural flow (position: relative)
+      // Only expand its width/height proportionally with parent
+      if (widthDelta !== 0) {
+        element.style.width = `${currentWidth + widthDelta}px`;
+      }
+      
+      if (heightDelta !== 0) {
+        element.style.height = `${currentHeight + heightDelta}px`;
+      }
+    }
   }
 
   public getLastRect(): IRect {

@@ -9,6 +9,7 @@ import { ApplyParentResizeConstraintsRequest } from './apply-parent-resize-const
 import { GetNormalizedElementRectRequest } from '../../domain';
 import { Injector } from '@angular/core';
 import { IResizeConstraint } from "./constraint";
+import { FComponentsStore } from '../../f-storage';
 
 export class NodeResizeDragHandler implements IFDragHandler {
 
@@ -16,6 +17,7 @@ export class NodeResizeDragHandler implements IFDragHandler {
   public readonly fData: any;
 
   private readonly _mediator: FMediator;
+  private readonly _store: FComponentsStore;
 
   private _originalRect!: IRect;
   private _constraints!: IResizeConstraint;
@@ -29,6 +31,7 @@ export class NodeResizeDragHandler implements IFDragHandler {
       fNodeId: _nodeOrGroup.fId(),
     };
     this._mediator = injector.get(FMediator);
+    this._store = injector.get(FComponentsStore);
   }
 
   public prepareDragSequence(): void {
@@ -63,9 +66,37 @@ export class NodeResizeDragHandler implements IFDragHandler {
   }
 
   private _redraw(changedRect: IRect): void {
+    const widthDelta = changedRect.width - this._originalRect.width;
+    const heightDelta = changedRect.height - this._originalRect.height;
+    
     this._nodeOrGroup.updatePosition(changedRect);
     this._nodeOrGroup.updateSize(changedRect);
     this._nodeOrGroup.redraw();
+    
+    // Also expand any fChildren slots within this node if it was resized
+    if (widthDelta !== 0 || heightDelta !== 0) {
+      this._expandChildrenSlot(widthDelta, heightDelta);
+    }
+  }
+
+  private _expandChildrenSlot(widthDelta: number, heightDelta: number): void {
+    const childrenSlot = this._store.fChildren.find((x: any) => x.fNodeId() === this._nodeOrGroup.fId());
+    
+    if (childrenSlot) {
+      const element = childrenSlot.hostElement;
+      const currentWidth = element.offsetWidth;
+      const currentHeight = element.offsetHeight;
+      
+      // Slot stays in natural flow (position: relative)
+      // Only expand its width/height proportionally with parent
+      if (widthDelta !== 0) {
+        element.style.width = `${currentWidth + widthDelta}px`;
+      }
+      
+      if (heightDelta !== 0) {
+        element.style.height = `${currentHeight + heightDelta}px`;
+      }
+    }
   }
 
   private _applyChildConstraints(changedRect: IRect): void {

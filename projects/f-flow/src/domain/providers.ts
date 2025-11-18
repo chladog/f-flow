@@ -22,6 +22,7 @@ import { F_NODE_FEATURES } from './f-node';
 import { F_LINE_ALIGNMENT_FEATURES } from './f-line-alignment';
 import { F_ZOOM_FEATURES } from './f-zoom';
 import { GetNormalizedConnectorRectExecution } from './get-normalized-connector-rect';
+import { AddChildrenToStore, RemoveChildrenFromStore } from './f-storage';
 
 /**
  * This module provides a collection of common providers for the FFlow domain.
@@ -69,4 +70,8 @@ export const COMMON_PROVIDERS = [
   UpdateItemAndChildrenLayersExecution,
 
   MoveFrontElementsBeforeTargetElement,
+
+  AddChildrenToStore,
+
+  RemoveChildrenFromStore,
 ];

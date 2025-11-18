@@ -5,6 +5,7 @@ import { NotifyDataChangedRequest } from '../../../f-storage';
 import { debounceTime, FChannelHub, notifyOnStart } from '../../../reactivity';
 import { FResizeChannel } from '../../../reactivity';
 import { FitToChildNodesAndGroupsRequest } from '../fit-to-child-nodes-and-groups';
+import { ConstrainChildrenToSlotRequest } from '../constrain-children-to-slot';
 import { IsDragStartedRequest } from '../../f-draggable';
 import { CalculateConnectorsConnectableSidesRequest } from '../calculate-connectors-connectable-sides';
 
@@ -27,13 +28,21 @@ export class UpdateNodeWhenStateOrSizeChanged
     const { hostElement, stateChanges } = nodeOrGroup;
 
     new FChannelHub(new FResizeChannel(hostElement), stateChanges)
-      .pipe(notifyOnStart(), debounceTime(10))
+      .pipe(notifyOnStart(), debounceTime(1)) // Reduced debounce for faster updates
       .listen(destroyRef, () => {
         this._mediator.execute<void>(new NotifyDataChangedRequest());
 
         if (!this._isDragging()) {
           this._mediator.execute<void>(new CalculateConnectorsConnectableSidesRequest(nodeOrGroup));
 
+          // First constrain children to their slot boundaries
+          this._mediator.execute<void>(new ConstrainChildrenToSlotRequest(nodeOrGroup));
+
+          // Then fit parent to children
+          this._mediator.execute<void>(new FitToChildNodesAndGroupsRequest(nodeOrGroup));
+        } else {
+          // During dragging, still perform position compensation for immediate feedback
+          // This ensures parent position stays correct even during fast movements
           this._mediator.execute<void>(new FitToChildNodesAndGroupsRequest(nodeOrGroup));
         }
       });

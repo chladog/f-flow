@@ -1,4 +1,5 @@
 import {ChangeDetectionStrategy, Component, signal, viewChild} from '@angular/core';
+import {NgClass} from '@angular/common';
 import {
   EFResizeHandleType,
   FCanvasComponent, FCreateNodeEvent, FDropToGroupEvent,
@@ -21,6 +22,7 @@ interface INode {
   imports: [
     FFlowModule,
     FCheckboxComponent,
+    NgClass,
   ]
 })
 export class DragToGroupComponent {
@@ -44,6 +46,37 @@ export class DragToGroupComponent {
   }, {
     id: 'n2', position: {x: 250, y: 250}
   }]);
+
+  // Helper method to calculate depth of a node in the hierarchy
+  protected getNodeDepth(nodeId: string): number {
+    const allItems = [...this.groups(), ...this.nodes()];
+    
+    const findDepth = (id: string, visited = new Set<string>()): number => {
+      if (visited.has(id)) return 0; // Prevent infinite loops
+      visited.add(id);
+      
+      const item = allItems.find(x => x.id === id);
+      if (!item || !item.parentId) return 0;
+      
+      return 1 + findDepth(item.parentId, visited);
+    };
+    
+    return findDepth(nodeId);
+  }
+
+  // Helper method to generate CSS classes for nodes
+  protected getNodeClasses(node: INode): Record<string, boolean> {
+    const depth = this.getNodeDepth(node.id);
+    const classes: Record<string, boolean> = {};
+    console.log('Node', node.id, 'Depth', depth);
+    if (node.parentId) {
+      classes['child'] = true;
+      classes[`depth-${depth}`] = true;
+      classes[`child-of-${node.parentId}`] = true;
+    }
+    
+    return classes;
+  }
 
   protected loaded(): void {
     this._canvas()?.resetScaleAndCenter(false);

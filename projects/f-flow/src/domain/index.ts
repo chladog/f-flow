@@ -18,6 +18,8 @@ export * from './f-node';
 
 export * from './f-selection';
 
+export * from './f-storage';
+
 export * from './f-zoom';
 
 export * from './get-deep-children-nodes-and-groups';

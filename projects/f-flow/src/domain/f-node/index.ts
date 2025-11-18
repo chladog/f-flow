@@ -10,6 +10,8 @@ export * from './calculate-nodes-bounding-box-normalized-position';
 
 export * from './calculate-output-connections';
 
+export * from './constrain-children-to-slot';
+
 export * from './fit-to-child-nodes-and-groups';
 
 export * from './get-child-node-ids';
