@@ -10,8 +10,8 @@ export * from './f-node.directive';
 
 export * from './f-node-base';
 
+export * from './f-children.directive';
+
 export * from './is-node';
 
 export * from './providers';
-
-

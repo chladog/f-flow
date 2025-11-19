@@ -14,6 +14,8 @@ export * from './fit-to-child-nodes-and-groups';
 
 export * from './get-child-node-ids';
 
+export * from './get-children-container-padding';
+
 export * from './get-node-padding';
 
 export * from './get-parent-nodes';
