@@ -11,6 +11,7 @@ import { GetChildNodeIds } from './get-child-node-ids';
 import { FitToChildNodesAndGroups } from './fit-to-child-nodes-and-groups';
 import { FitChildrenToChildNodes } from './fit-children-to-child-nodes';
 import { GetChildrenContainerPadding } from './get-children-container-padding';
+import { ExpandChildrenContainer } from './expand-children-container';
 import {
   CalculateConnectableSideByConnectedPositions,
   CalculateConnectableSideByInternalPosition,
@@ -36,6 +37,8 @@ export const F_NODE_FEATURES = [
   CalculateNodesBoundingBoxNormalizedPosition,
 
   CalculateOutputConnections,
+
+  ExpandChildrenContainer,
 
   FitChildrenToChildNodes,
 

@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ApplyParentResizeConstraintsRequest } from './apply-parent-resize-constraints-request';
 import { IRect } from '@foblex/2d';
-import { FExecutionRegister, IExecution } from '@foblex/mediator';
+import { FExecutionRegister, FMediator, IExecution } from '@foblex/mediator';
 import { IResizeLimit, IResizeLimits, IResizeOverflow } from '../constraint';
+import { ExpandChildrenContainerRequest } from '../../../domain';
 
 /**
  * Resize constraints behavior:
@@ -16,6 +17,8 @@ import { IResizeLimit, IResizeLimits, IResizeOverflow } from '../constraint';
 export class ApplyParentResizeConstraints
   implements IExecution<ApplyParentResizeConstraintsRequest, void>
 {
+  private readonly _mediator = inject(FMediator);
+
   /** Entry point: applies soft and hard resize constraints. */
   public handle({ rect, limits }: ApplyParentResizeConstraintsRequest): void {
     this._applyResizeConstraints(rect, limits);
@@ -165,5 +168,8 @@ export class ApplyParentResizeConstraints
     limit.nodeOrGroup.updatePosition(rect);
     limit.nodeOrGroup.updateSize(rect);
     limit.nodeOrGroup.redraw();
+
+    // Also expand fChildren container if present
+    this._mediator.execute<void>(new ExpandChildrenContainerRequest(limit.nodeOrGroup, rect));
   }
 }
