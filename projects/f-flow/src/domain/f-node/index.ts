@@ -10,9 +10,15 @@ export * from './calculate-nodes-bounding-box-normalized-position';
 
 export * from './calculate-output-connections';
 
+export * from './expand-children-container';
+
+export * from './fit-children-to-child-nodes';
+
 export * from './fit-to-child-nodes-and-groups';
 
 export * from './get-child-node-ids';
+
+export * from './get-children-container-padding';
 
 export * from './get-node-padding';
 

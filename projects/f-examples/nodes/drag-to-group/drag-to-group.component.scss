@@ -18,6 +18,21 @@
   background-color: var(--minimap-view-color);
 }
 
+.group-header,
+.node-header {
+  padding: 8px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--node-border-color);
+}
+
+.group-children,
+.node-children {
+  padding: 16px;
+  min-width: 200px;
+  min-height: 100px;
+  position: relative;
+}
+
 .f-flow {
   &.f-dragging {
     .f-node {

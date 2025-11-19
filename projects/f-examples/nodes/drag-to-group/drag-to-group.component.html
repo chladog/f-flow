@@ -11,12 +11,19 @@
         fDragHandle
         [fGroupId]="group.id"
         [fGroupParentId]="group.parentId"
-        [fIncludePadding]="includePaddings()"
+        [fIncludePadding]="includePaddings() && !useChildren()"
         [fAutoSizeToFitChildren]="autoSizeToFitChildren()"
         [fAutoExpandOnChildHit]="autoExpandOnChildHit()"
         [fGroupPosition]="group.position"
       >
-        Drag to Group
+        @if (useChildren()) {
+          <div class="group-header">Drag to Group</div>
+          <div fChildren class="group-children">
+            <!-- Child nodes will be contained here -->
+          </div>
+        } @else {
+          Drag to Group
+        }
       </div>
     }
 
@@ -26,12 +33,19 @@
         fDragHandle
         [fNodeId]="node.id"
         [fNodeParentId]="node.parentId"
-        [fIncludePadding]="includePaddings()"
+        [fIncludePadding]="includePaddings() && !useChildren()"
         [fAutoSizeToFitChildren]="autoSizeToFitChildren()"
         [fAutoExpandOnChildHit]="autoExpandOnChildHit()"
         [fNodePosition]="node.position"
       >
-        Drag to Group
+        @if (useChildren() && !node.parentId) {
+          <div class="node-header">Drag to Group</div>
+          <div fChildren class="node-children">
+            <!-- Child nodes can be contained here too -->
+          </div>
+        } @else {
+          Drag to Group
+        }
       </div>
     }
   </f-canvas>
@@ -39,6 +53,7 @@
 <div class="examples-toolbar">
   <div class="external-item" fExternalItem>Drag to Group</div>
   <div class="flex-space"></div>
+  <f-checkbox [checked]="useChildren()" (change)="changeUseChildren()">Use fChildren</f-checkbox>
   <f-checkbox [checked]="includePaddings()" (change)="changePaddings()"
     >Include Paddings</f-checkbox
   >
