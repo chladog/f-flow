@@ -1,10 +1,12 @@
-import {ChangeDetectionStrategy, Component, signal, viewChild} from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import {
   EFResizeHandleType,
-  FCanvasComponent, FCreateNodeEvent, FDropToGroupEvent,
+  FCanvasComponent,
+  FCreateNodeEvent,
+  FDropToGroupEvent,
   FFlowModule,
 } from '@foblex/flow';
-import {FCheckboxComponent} from "@foblex/m-render";
+import { FCheckboxComponent } from '@foblex/m-render';
 
 interface INode {
   id: string;
@@ -18,35 +20,46 @@ interface INode {
   templateUrl: './drag-to-group.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [
-    FFlowModule,
-    FCheckboxComponent,
-  ]
+  imports: [FFlowModule, FCheckboxComponent],
 })
 export class DragToGroupComponent {
-
   private readonly _canvas = viewChild.required(FCanvasComponent);
 
+  protected readonly useChildren = signal<boolean>(false);
   protected readonly includePaddings = signal<boolean>(true);
   protected readonly autoSizeToFitChildren = signal<boolean>(true);
   protected readonly autoExpandOnChildHit = signal<boolean>(true);
 
   protected readonly eResizeHandleType = EFResizeHandleType;
 
-  protected readonly groups = signal<INode[]>([{
-    id: 'g1', position: {x: 0, y: 0}
-  }, {
-    id: 'g2', position: {x: 0, y: 250}
-  }]);
+  protected readonly groups = signal<INode[]>([
+    {
+      id: 'g1',
+      position: { x: 0, y: 0 },
+    },
+    {
+      id: 'g2',
+      position: { x: 0, y: 250 },
+    },
+  ]);
 
-  protected readonly nodes = signal<INode[]>([{
-    id: 'n1', position: {x: 250, y: 0}
-  }, {
-    id: 'n2', position: {x: 250, y: 250}
-  }]);
+  protected readonly nodes = signal<INode[]>([
+    {
+      id: 'n1',
+      position: { x: 250, y: 0 },
+    },
+    {
+      id: 'n2',
+      position: { x: 250, y: 250 },
+    },
+  ]);
 
   protected loaded(): void {
     this._canvas()?.resetScaleAndCenter(false);
+  }
+
+  protected changeUseChildren(): void {
+    this.useChildren.set(!this.useChildren());
   }
 
   protected changePaddings(): void {
@@ -63,19 +76,19 @@ export class DragToGroupComponent {
 
   protected onDropToGroup(event: FDropToGroupEvent): void {
     if (!event.fTargetNode) {
-      return
+      return;
     }
 
     const groups = this.groups();
     const nodes = this.nodes();
 
     event.fNodes.forEach((id) => {
-      const group = groups.find(x => x.id === id);
+      const group = groups.find((x) => x.id === id);
       if (group) {
         group.parentId = event.fTargetNode;
       } else {
-        const node = nodes.find(x => x.id === id);
-        if(node) {
+        const node = nodes.find((x) => x.id === id);
+        if (node) {
           node!.parentId = event.fTargetNode;
         }
       }
